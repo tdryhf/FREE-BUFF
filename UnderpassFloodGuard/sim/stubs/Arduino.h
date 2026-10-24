@@ -3,6 +3,9 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <cctype>
+#include <algorithm>
+#include <cstdlib>
 #include <cmath>
 #include <string>
 #include <functional>
@@ -39,6 +42,7 @@ class String {
   String& operator+=(long n){ s += std::to_string(n); return *this; }
   String& operator+=(unsigned long n){ s += std::to_string(n); return *this; }
   bool operator==(const char* c) const { return s == c; }
+  long toInt() const { return s.empty() ? 0 : strtol(s.c_str(), nullptr, 10); }
 };
 struct SerialStub {
   void begin(unsigned long){}
@@ -52,5 +56,11 @@ struct SerialStub {
   void out(int v){ out(std::to_string(v).c_str()); }
   void out(unsigned int v){ out(std::to_string(v).c_str()); }
   void out(char* c){ out((const char*)c); }
+  // typed input for the Serial-command tests: harness pushes text into `in`
+  std::string in;
+  int available(){ return (int)in.size(); }
+  int read(){ if(in.empty()) return -1; int c=(unsigned char)in[0]; in.erase(0,1); return c; }
 };
 extern SerialStub Serial;
+struct EspStub { uint32_t getFreeHeap(){ return 215000; } };
+extern EspStub ESP;
